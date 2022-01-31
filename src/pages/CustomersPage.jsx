@@ -8,7 +8,7 @@ const CustomersPage = (props) => {
     useEffect(()=>{
         Axios.get("http://127.0.0.1:8000/api/customers")
             .then(response => response.data['hydra:member'])
-            .then(data => console.log(data))
+            .then(data => setCustomers(data))
             .catch(error => console.log(error.response))
     },[])
     
@@ -29,7 +29,24 @@ const CustomersPage = (props) => {
                     </tr>    
                 </thead> 
                 <tbody>
-
+                    {customers.map(customer => (
+                        <tr key={customer.id}>
+                            <td>{customer.id}</td>
+                            <td>{customer.firstName} {customer.lastName}</td>
+                            <td>{customer.email}</td>
+                            <td>{customer.company}</td>
+                            <td className='text-center'>
+                                <span className="badge badge-primary">
+                                    {customer.invoices.length}
+                                </span>
+                            </td>
+                            <td className="text-center">{customer.totalAmount.toLocaleString()}€</td>
+                            <td className="text-center">{customer.unpaidAmount.toLocaleString()}€</td>
+                            <td>
+                                <button className="btn btn-sm btn-danger">Supprimer</button>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>           
             </table>    
         
