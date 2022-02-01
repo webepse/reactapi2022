@@ -1,5 +1,4 @@
 import {useState, useEffect} from 'react';
-import Axios from "axios"
 import Pagination from '../components/Pagination';
 import customersAPI from '../services/customersAPI';
 
@@ -9,6 +8,9 @@ const CustomersPage = (props) => {
 
     //pour la pagination
     const [currentPage, setCurrentPage] = useState(1)
+
+    //filtre 
+    const [search, setSearch] = useState("")
     
     const fetchCustomers = async () => {
         try{
@@ -26,20 +28,36 @@ const CustomersPage = (props) => {
       fetchCustomers()
     },[])
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         // pessimiste
         const originalCustomers = [...customers]
 
         // optimiste
         setCustomers(customers.filter(customer => customer.id !== id))
 
-        Axios.delete(`http://127.0.0.1:8000/api/customers/${id}`)
-            .then(response => console.log('ok'))
-            .catch(error => {
-                setCustomers(originalCustomers)
-                console.log(error.response)
-            })
+        // si cela n'a pas fonctionné, on réintègre la copie avec originalCustomers
+        try{
+            await customersAPI.delete(id)
+        }catch(error)
+        {
+            setCustomers(originalCustomers)
+            // notif à faire
+        }
     }
+
+    // pour les filtres
+    const handleSearch = event => {
+        const value = event.currentTarget.value 
+        setSearch(value)
+        setCurrentPage(1)
+    }
+
+    const filteredCustomers = customers.filter(c =>
+        c.firstName.toLowerCase().includes(search.toLowerCase()) ||
+        c.lastName.toLowerCase().includes(search.toLowerCase()) || 
+        c.email.toLowerCase().includes(search.toLowerCase()) || 
+        (c.company && c.company.toLowerCase().includes(search.toLowerCase()))    
+    )
 
     // pour la pagination
     const handlePageChange = (page) => {
@@ -48,11 +66,15 @@ const CustomersPage = (props) => {
 
     const itemsPerPage = 10
 
-    const paginatedCustomers = Pagination.getData(customers, currentPage, itemsPerPage)
+    const paginatedCustomers = Pagination.getData(filteredCustomers, currentPage, itemsPerPage)
     
     return ( 
         <>
             <h1>Liste des clients</h1>
+            {/* filtre */}
+            <div className="form-group">
+                <input type="text" className='form-control' placeholder='Rechercher...' onChange={handleSearch} value={search} />
+            </div>
             <table className='table table-hover'>
                 <thead>
                     <tr>
@@ -90,12 +112,16 @@ const CustomersPage = (props) => {
                     ))}
                 </tbody>           
             </table>
-            <Pagination 
-                currentPage={currentPage}
-                itemsPerPage={itemsPerPage}
-                length={customers.length}
-                onPageChanged={handlePageChange}
-            />    
+            {
+                itemsPerPage < filteredCustomers.length && 
+                <Pagination 
+                    currentPage={currentPage}
+                    itemsPerPage={itemsPerPage}
+                    length={filteredCustomers.length}
+                    onPageChanged={handlePageChange}
+                />    
+
+            }
         
         </>
      );
