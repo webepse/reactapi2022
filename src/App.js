@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
@@ -7,16 +8,17 @@ import InvoicesPage from './pages/InvoicesPage';
 import LoginPage from './pages/LoginPage';
 import authAPI from './services/authAPI';
 
-function App() {
+authAPI.setup()
 
-  authAPI.setup()
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(authAPI.isAuthenticated())
 
   return (
     <Router>
-      <Navbar />
+      <Navbar isAuthenticated={isAuthenticated} onLogout={setIsAuthenticated} />
       <main className='container pt-5'>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage onLogin={setIsAuthenticated} />} />
           <Route path="/invoices" element={<InvoicesPage />}/>
           <Route path="/customerspage" element={<CustomersPageWithPagination />} />
           <Route path="/customers" element={<CustomersPage />} />
