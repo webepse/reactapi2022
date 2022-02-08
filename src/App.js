@@ -7,6 +7,7 @@ import CustomersPageWithPagination from './pages/CustomersPageWithPagination';
 import InvoicesPage from './pages/InvoicesPage';
 import LoginPage from './pages/LoginPage';
 import authAPI from './services/authAPI';
+import PrivateRoute from "./components/PrivateRoute"
 
 authAPI.setup()
 
@@ -19,9 +20,17 @@ function App() {
       <main className='container pt-5'>
         <Routes>
           <Route path="/login" element={<LoginPage onLogin={setIsAuthenticated} />} />
-          <Route path="/invoices" element={<InvoicesPage />}/>
+          <Route path="/invoices" element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <InvoicesPage />
+            </PrivateRoute>
+          }/>
           <Route path="/customerspage" element={<CustomersPageWithPagination />} />
-          <Route path="/customers" element={<CustomersPage />} />
+          <Route path="/customers" element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <CustomersPage />
+            </PrivateRoute>
+          } />
           <Route path="/" element={<HomePage />} />
         </Routes>
       </main>
