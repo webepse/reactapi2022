@@ -43,6 +43,32 @@ const CustomerPage = (props) => {
         }
     },[id])
 
+    const handleSubmit = async (event) => {
+        event.preventDefault()
+        //console.log(customer)
+        try{
+            // vérifier si on édite ou non
+            if(editing){
+                await customersAPI.update(id, customer)
+            }else{
+                await customersAPI.create(customer)
+                navigate("/customers", {replace: true})
+            }
+        }catch({response}){
+            // console.log(response)
+            const {violations} = response.data
+            //console.log(violations)
+            if(violations){
+                const apiErrors = {}
+                violations.forEach(({propertyPath, message})=>{
+                    apiErrors[propertyPath] = message
+                })
+                setErrors(apiErrors)
+            }
+        }
+
+    }
+
     const handleChange = (event) => {
         // const value = event.currentTarget.value 
         // const name = event.currentTarget.name 
@@ -53,7 +79,7 @@ const CustomerPage = (props) => {
     return ( 
         <>
             {!editing ? <h1>Création d'un client</h1> : <h1>Modification d'un client</h1>}
-            <form>
+            <form onSubmit={handleSubmit}>
                 <Field 
                     name="lastName"
                     label="Nom de famille"
