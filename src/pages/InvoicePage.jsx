@@ -67,8 +67,27 @@ const InvoicePage = (props) => {
         setInvoice({...invoice, [name]:value})
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
+        try{
+            // si je suis en édition ou en création 
+            if(editing){
+                await invoicesAPI.update(id, invoice)
+            }else{
+                await invoicesAPI.create(invoice)
+                navigate("/invoices",{replace: true})
+            }
+        }catch({response})
+        {
+            const {violations} = response.data
+            if(violations){
+                const apiErrors = {}
+                violations.forEach(({propertyPath, message}) => {
+                    apiErrors[propertyPath] = message
+                })
+                setErrors(apiErrors)
+            }
+        }
     }
 
 
