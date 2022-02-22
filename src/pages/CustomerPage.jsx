@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import Field from '../components/forms/Field';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import customersAPI from '../services/customersAPI';
+import { toast } from 'react-toastify'
 
 const CustomerPage = (props) => {
 
@@ -30,7 +31,7 @@ const CustomerPage = (props) => {
             const {firstName, lastName, email, company} = await customersAPI.find(id)
             setCustomer({firstName, lastName, email, company})
         }catch(error){
-            // notif
+            toast.error("Le client n'a pas pu être chargé")
             navigate("/customers", {replace: true})
         }
     }
@@ -50,8 +51,10 @@ const CustomerPage = (props) => {
             // vérifier si on édite ou non
             if(editing){
                 await customersAPI.update(id, customer)
+                toast.success("Le client a bien été modifié")
             }else{
                 await customersAPI.create(customer)
+                toast.success("Le client a bien été enregistré")
                 navigate("/customers", {replace: true})
             }
         }catch({response}){
@@ -113,7 +116,7 @@ const CustomerPage = (props) => {
                     error={errors.company}
                 />
                 <div className="my-3">
-                    <button type="submit" className='btn btn-success'>Enregistrer</button>
+                    <button type="submit" className={(editing) ? 'btn btn-warning' : 'btn btn-success'}>{ editing ? 'Modifier' : 'Enregistrer'}</button>
                     <Link to="/customers" className='btn btn-secondary'>Retour aux clients</Link>
                 </div>
 

@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react';
 import Pagination from '../components/Pagination';
 import customersAPI from '../services/customersAPI';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify'
 
 const CustomersPage = (props) => {
     
@@ -71,7 +72,10 @@ const CustomersPage = (props) => {
     
     return ( 
         <>
-            <h1>Liste des clients</h1>
+            <div className="d-flex justify-content-between align-items-center">
+                <h1>Liste des clients</h1>
+                <Link to="/customers/new" className='btn btn-primary mb-3'>Créer un client</Link>
+            </div>
             {/* filtre */}
             <div className="form-group">
                 <input type="text" className='form-control' placeholder='Rechercher...' onChange={handleSearch} value={search} />
