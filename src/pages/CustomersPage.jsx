@@ -20,8 +20,7 @@ const CustomersPage = (props) => {
             setCustomers(data)
         }catch(error)
         {
-            // notif à faire
-            console.log(error.response)
+           toast.error("Impossible de charger les clients")
         }
     }
 
@@ -40,10 +39,11 @@ const CustomersPage = (props) => {
         // si cela n'a pas fonctionné, on réintègre la copie avec originalCustomers
         try{
             await customersAPI.delete(id)
+            toast.warning("Le client "+id+" a bien été supprimé")
         }catch(error)
         {
             setCustomers(originalCustomers)
-            // notif à faire
+            toast.error("La supperession du client n'a pas pu fonctionner")
         }
     }
 

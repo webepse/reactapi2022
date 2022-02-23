@@ -68,6 +68,7 @@ const CustomerPage = (props) => {
                 })
                 setErrors(apiErrors)
             }
+            toast.error("Une erreur est survenue")
         }
 
     }
